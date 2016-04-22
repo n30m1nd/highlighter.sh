@@ -6,7 +6,6 @@
 # TODO: Add support for interactive commands such as /bin/bash (I expect not to use expect)
 # TODO: Prevent file overwrite (In function: do_screenshot)
 # TODO: Support multiple matching groups and generate an image per matching group
-# TODO: Make arguments non-positional with the use getopt or $@ and shift
 
 # UNCOMMENT THE NEXT LINE FOR DEBUGGING
 # set -x
