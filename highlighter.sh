@@ -89,7 +89,7 @@ function main {
 }
 
 function show_usage {
-  echo -e "[+] Usage: \n\t$0 command input_target(s) regex [max_threads] [prependtofile]"
+  echo -e "[+] Usage: \n\t$0 -c command -h input_target(s) -r regex -t max_threads_to_run -O output_path_or_file"
   echo -e "[i] Examples: "
   echo -e "[+]\tRead domains/ips from a file and highlight the server header"
   echo -e "\t\t$0 -c \"curl -I -s _target_\" -h targets.txt -r \"(server.*)\\\r\" -t 3 -O server-header-"
