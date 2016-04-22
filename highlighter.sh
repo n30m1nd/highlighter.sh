@@ -10,12 +10,16 @@
 # UNCOMMENT THE NEXT LINE FOR DEBUGGING
 # set -x
 
-# CONFIG #
+# ImageMagicks PANGO's CONFIG #
 default_font="Courier"
 default_font_color='green'
 font_tag_start="<span font_family='monospace' background='black' fgcolor='$default_font_color'>"
 font_tag_end="</span>"
 # END OF CONFIG #
+
+# Bash COLORS/FONTS
+bold_bf=$(tput bold)
+normal_bf=$(tput sgr0)
 
 # BANNER #
 echo -e "\e[101m\e[5m******* RECUADRER.SH *******\e[49m\e[39m"
@@ -68,6 +72,23 @@ function do_screenshot {
   fi
 }
 
+function show_help {
+  echo -e "Usage: $0 -c "command _target_" -h host_or_input_file -r regex [-t threads] [-O outputfile_or_path]"
+  echo -e "  -c [command to run]: Sepcify the command to take a screenshot of."
+  echo -e "\t Write the string ${bold_bf}_target_${normal_bf} in the position you want your target host replaced."
+  echo -e "  -h [target]: Target can be an IP a domain or an input file with a list of hosts, each host per line"
+  echo -e "  -r [regex]: Regex must contain a matching group that will be highlighted."
+  echo -e "\t Example: -r \"(.*)\" Will match everything in the screenshot."
+  echo -e "  -t [number]: Maximum number of threads to run"
+  echo -e "  -O [output]: File or path to save images to."
+  echo -e "\t Ex: -O \"myfolder/prepend-this-\" Will generate a file in \"myfolder\" with the name \"prepend-this-target.domain.com.png\""
+  echo -e "Examples: "
+  echo -e "\tRead domains/ips from a file and highlight the server header"
+  echo -e "\t\t$0 -c \"curl -I -s _target_\" -h targets.txt -r \"(server.*)\\\r\" -t 3 -O server-header-"
+  echo -e "\tHighlight open ports on a single domain/ip"
+  echo -e "\t\t$0 -c \"nmap -F -sT _target_\" -h scanme.nmap.org -r \"(.*open.*)\""
+}
+
 # EOF auxiliary functions, mental insanity now
 
 function main {
@@ -89,11 +110,7 @@ function main {
 
 function show_usage {
   echo -e "[+] Usage: \n\t$0 -c command -h input_target(s) -r regex -t max_threads_to_run -O output_path_or_file"
-  echo -e "[i] Examples: "
-  echo -e "[+]\tRead domains/ips from a file and highlight the server header"
-  echo -e "\t\t$0 -c \"curl -I -s _target_\" -h targets.txt -r \"(server.*)\\\r\" -t 3 -O server-header-"
-  echo -e "[+]\tHighlight open ports on a single domain/ip"
-  echo -e "\t\t$0 -c \"nmap -F -sT _target_\" -h scanme.nmap.org -r \"(.*open.*)\""
+
 }
 
 
@@ -117,6 +134,7 @@ prependtofile=""
 
 
 while getopts ":c:h:r:t:O:" opt; do
+  echo -e "[+] Optarg is ${OPTARG}"
   case $opt in
     c)
       cmd="$OPTARG"
@@ -135,20 +153,22 @@ while getopts ":c:h:r:t:O:" opt; do
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
+      show_help
       exit 1
       ;;
     :)
       echo "Option -$OPTARG requires an argument." >&2
+      show_help
       exit 1
       ;;
-  esac
+    esac
 done
 
 ### End of program args ###
 
 
 if [ -z "$cmd" ] ; then
-  show_usage
+  show_help
   exit
 fi
 
@@ -160,7 +180,7 @@ for target in $(get_targets "$input"); do
 
   threads=$(($threads+1))
   if [[ "$threads" == "$max_threads" ]]; then
-    print_yellow "[i] Waiting for threads to finish"
+    print_yellow "Waiting for threads to finish"
     threads=0
 	# Try to wait for all background processes to finish
     for thread in $(seq 0 $max_threads); do
