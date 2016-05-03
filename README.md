@@ -1,5 +1,5 @@
 # highlighter.sh
-Tool that runs commands concurrently, takes a screenshot of the output highlighting user specified strings through regular expressions
+Tool that runs commands concurrently and takes a screenshot of the output highlighting user specified strings through regular expressions
 
 # Help
 ## Usage:
